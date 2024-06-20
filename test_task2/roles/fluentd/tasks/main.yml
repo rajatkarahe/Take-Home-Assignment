@@ -1,0 +1,36 @@
+---
+- name: install os packages
+  package:
+    name: '{{ item }}'
+    state: latest
+  with_items: 
+        - libcurl4-gnutls-dev
+        - build-essential
+
+- name: insatll fluentd on debian/ubuntu
+  raw: "curl -L https://toolbelt.treasuredata.com/sh/install-ubuntu-xenial-td-agent2.sh | sh"
+
+- name: Install Fluentd plugins
+  shell: |
+    td-agent-gem install fluent-plugin-parser
+    td-agent-gem install fluent-plugin-grep
+    td-agent-gem install fluent-plugin-rewrite-tag-filter
+
+- name: Copy Fluentd configuration file
+  copy:
+    src:  fluentd.conf.j2
+    dest: /etc/td-agent/td-agent.conf
+    owner: td-agent
+    group: td-agent
+    mode: '0644'
+
+- name: Validate Fluentd configuration
+  command: td-agent --dry-run -c /etc/td-agent/td-agent.conf
+  register: validation_result
+  failed_when: "validation_result.rc != 0"
+
+- name: Restart Fluentd service
+  service:
+    name: td-agent
+    state: restarted
+  when: validation_result.rc == 0
