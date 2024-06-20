@@ -1,0 +1,99 @@
+---
+- hosts: all
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+
+    - name: Create directory for static content
+      file:
+        path: /var/www/html/hello-world
+        state: directory
+        mode: 0755
+
+    - name: Create "index.html" file with "hello world" content
+      template:
+        src: "index.html.j2"
+        dest: /var/www/html/hello-world/index.html
+        mode: 0644
+    - name: Copy "index.html" to default Nginx location
+      copy:
+        src: /var/www/html/hello-world/index.html
+        dest: /var/www/html/index.html
+        mode: 0644
+        remote_src: true
+
+    - name: Enable default Nginx website
+      file:
+        src: /etc/nginx/sites-available/default
+        path: /etc/nginx/sites-enabled/default
+        state: link
+
+    - name: Restart Nginx
+      service:
+        name: nginx
+        state: restarted
+
+    - name: Permission to nginx log file
+      shell: "chmod -R 777 /var/log/nginx/"
+      become: true
+
+    - name: install os packages
+      package:
+        name: '{{ item }}'
+        state: latest
+      with_items: 
+            - libcurl4-gnutls-dev
+            - build-essential
+
+
+    - name: insatll fluentd on debian/ubuntu
+      raw: "curl -L https://toolbelt.treasuredata.com/sh/install-ubuntu-xenial-td-agent2.sh | sh"
+
+    - name: Install Fluentd plugins
+      shell: |
+        td-agent-gem install fluent-plugin-parser
+        td-agent-gem install fluent-plugin-grep
+        td-agent-gem install fluent-plugin-rewrite-tag-filter
+
+    - name: Copy Fluentd configuration file
+      copy:
+        src:  fluentd.conf.j2
+        dest: /etc/td-agent/td-agent.conf
+        owner: td-agent
+        group: td-agent
+        mode: '0644'
+
+    - name: Validate Fluentd configuration
+      command: td-agent --dry-run -c /etc/td-agent/td-agent.conf
+      register: validation_result
+      failed_when: "validation_result.rc != 0"
+
+    - name: Restart Fluentd service
+      service:
+        name: td-agent
+        state: restarted
+      when: validation_result.rc == 0
+
+    - name: Deploy logrotate configuration for nginx access log
+      template:
+        src: templates/logrotate.conf
+        dest: /etc/logrotate.d/nginx-access
+        mode: '0644'
+      become: yes
+
+    - name: Restart nginx service
+      service:
+        name: nginx
+        state: restarted
+      become: yes
+      
+    - name: Configure UFW
+      ufw:
+        rule: allow
+        port: 80
+        proto: tcp
+        state: enabled

@@ -1,0 +1,2 @@
+# List the IP addresses you want to deny, one per line
+10.2.3.1
