@@ -1,19 +1,28 @@
+locals {
+  vpc_name              = "nginx-vpc"
+  subnet_name           = "nginx-subnet"
+  internet_gateway_name = "nginx-igw"
+  route_table_name      = "nginx-route-table"
+  security_group_name   = "nginx-sg"
+  instance_name         = "nginx-server"
+}
+
 # VPC
 resource "aws_vpc" "nginx_vpc" {
   cidr_block = var.vpc_cidr
   tags = {
-    Name = "nginx-vpc"
+    Name = local.vpc_name
   }
 }
 
 # Subnet
 resource "aws_subnet" "nginx_subnet" {
-  vpc_id            = aws_vpc.nginx_vpc.id
-  cidr_block        = var.public_subnet_cidr
-  availability_zone = "us-west-2a"
+  vpc_id                  = aws_vpc.nginx_vpc.id
+  cidr_block              = var.public_subnet_cidr
+  availability_zone       = var.availability_zone
   map_public_ip_on_launch = true
   tags = {
-    Name = "nginx-subnet"
+    Name = local.subnet_name
   }
 }
 
@@ -21,7 +30,7 @@ resource "aws_subnet" "nginx_subnet" {
 resource "aws_internet_gateway" "nginx_igw" {
   vpc_id = aws_vpc.nginx_vpc.id
   tags = {
-    Name = "nginx-igw"
+    Name = local.internet_gateway_name
   }
 }
 
@@ -33,7 +42,7 @@ resource "aws_route_table" "nginx_route_table" {
     gateway_id = aws_internet_gateway.nginx_igw.id
   }
   tags = {
-    Name = "nginx-route-table"
+    Name = local.route_table_name
   }
 }
 
@@ -46,7 +55,7 @@ resource "aws_route_table_association" "nginx_route_table_association" {
 # Security Group
 resource "aws_security_group" "nginx_sg" {
   vpc_id      = aws_vpc.nginx_vpc.id
-  name        = "nginx-sg"
+  name        = local.security_group_name
   description = "Allow HTTP traffic"
 
   ingress {
@@ -64,27 +73,22 @@ resource "aws_security_group" "nginx_sg" {
   }
 
   tags = {
-    Name = "nginx-sg"
+    Name = local.security_group_name
   }
 }
 
 # EC2 Instance
 resource "aws_instance" "nginx_instance" {
-  ami                    = "ami-0cf2b4e024cdb6960"  # Ubuntu 20.04 AMI in us-west-2
-  instance_type          = "t2.micro"
-  subnet_id              = aws_subnet.nginx_subnet.id
-  vpc_security_group_ids = [aws_security_group.nginx_sg.id]
+  ami                         = var.ami_id
+  instance_type               = var.instance_type
+  subnet_id                   = aws_subnet.nginx_subnet.id
+  vpc_security_group_ids      = [aws_security_group.nginx_sg.id]
   associate_public_ip_address = true
 
-  user_data = <<-EOF
-              #!/bin/bash
-              apt-get update
-              apt-get install -y nginx
-              systemctl start nginx
-              systemctl enable nginx
-              EOF
+  user_data = templatefile("${path.module}/user_data.tpl", {})
+
 
   tags = {
-    Name = "nginx-server"
+    Name = local.instance_name
   }
 }

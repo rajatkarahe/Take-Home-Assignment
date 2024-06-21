@@ -10,7 +10,7 @@ This repository contains Terraform configuration files to provision an EC2 insta
 ## Prerequisites
 
 - Terraform installed (>= 0.12)
-- AWS account with access keys configured
+- AWS account with access keys configured using `aws configure` command.
 - AWS CLI installed and configured (optional)
 
 ## Usage
@@ -52,6 +52,32 @@ public_ip = "x.x.x.x"
 Open your web browser and navigate to `http://x.x.x.x.`
 
 
+### Example user_data.tpl
+Create a file named user_data.tpl in your repository with the following content:
+
+**file name: user_data.tpl**
+```sh 
+#!/bin/bash
+apt-get update
+apt-get install -y nginx
+service nginx start
+systemctl enable nginx
+```
+
+### Example main.tf with Locals
+This is your main.tf file with added locals block:
+
+```sh 
+locals {
+  vpc_name              = "nginx-vpc"
+  subnet_name           = "nginx-subnet"
+  internet_gateway_name = "nginx-igw"
+  route_table_name      = "nginx-route-table"
+  security_group_name   = "nginx-sg"
+  instance_name         = "nginx-server"
+}
+```
+
 ### Extra Credit: Terraform State Management.
 
 #### Why terraform state management is needed?
@@ -76,9 +102,27 @@ terraform {
     bucket = "your-terraform-state-bucket"
     key    = "terraform/state"
     region = "us-west-2"
+    dynamodb_table = "terraform_locks"
   }
 }
 ```
+**Create DynamoDB Table:**
+
+Define a DynamoDB table to store lock information. Here's an example using Terraform:
+
+```sh
+resource "aws_dynamodb_table" "terraform_locks" {
+  name           = "terraform_locks"
+  hash_key       = "LockID"
+  attribute {
+    name = "LockID"
+    type = "S"
+  }
+}
+```
+
+**Example Usage**
+After configuring your backend and creating the DynamoDB table, Terraform will automatically manage state locking using DynamoDB. This setup ensures that concurrent Terraform operations are safely handled, maintaining the integrity of your infrastructure state.
 
 **Pros:**
 - Centralized state management

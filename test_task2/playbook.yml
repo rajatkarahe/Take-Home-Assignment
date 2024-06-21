@@ -37,8 +37,12 @@
         name: nginx
         state: restarted
 
-    - name: Permission to nginx log file
-      shell: "chmod -R 777 /var/log/nginx/"
+    - name: Permission to nginx log directory
+      ansible.builtin.file:
+        path: /var/log/nginx
+        state: directory
+        recurse: yes
+        mode: '0777'
       become: true
 
     - name: install os packages
@@ -54,10 +58,13 @@
       raw: "curl -L https://toolbelt.treasuredata.com/sh/install-ubuntu-xenial-td-agent2.sh | sh"
 
     - name: Install Fluentd plugins
-      shell: |
-        td-agent-gem install fluent-plugin-parser
-        td-agent-gem install fluent-plugin-grep
-        td-agent-gem install fluent-plugin-rewrite-tag-filter
+      ansible.builtin.command:
+        cmd: "td-agent-gem install {{ item }}"
+      with_items:
+        - fluent-plugin-parser
+        - fluent-plugin-grep
+        - fluent-plugin-rewrite-tag-filter
+      become: true
 
     - name: Copy Fluentd configuration file
       copy:
