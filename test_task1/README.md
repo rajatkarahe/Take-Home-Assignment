@@ -90,9 +90,7 @@ It helps in:
 2. Collaboration: Allows multiple team members to work on the same infrastructure without conflicts.
 
 3. Drift Detection: Detects changes made outside Terraform, ensuring the configuration remains as intended.
-Proposed
 
-##### Proposed Solution
 **Method:** Remote backend(using AWS S3).
 
 **Configuration:**

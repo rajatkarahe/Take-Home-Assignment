@@ -61,20 +61,19 @@ echo "mypassword" | docker secret create postgres_password -
 ```
 
 - **Usage of Vault for PostgreSQL Secret Encryption**
-Setup Vault: Ensure Vault is initialized and unsealed with appropriate access policies for PostgreSQL secrets.
+    Setup Vault: Ensure Vault is initialized and unsealed with appropriate access policies for PostgreSQL secrets.
 
-**Store PostgreSQL Credentials: Use Vault to securely store PostgreSQL credentials as a key-value pair:**
+    **Store PostgreSQL Credentials: Use Vault to securely store PostgreSQL credentials as a key-value pair:**
 
-vault kv put secret/postgres-creds username=myuser password=mypassword
+    vault kv put secret/postgres-creds username=myuser password=mypassword
 
-**Access PostgreSQL Secrets: Configure your application or service to retrieve PostgreSQL credentials from Vault:**
+    **Access PostgreSQL Secrets: Configure your application or service to retrieve PostgreSQL credentials from Vault:**
 
-vault kv get -field=username secret/postgres-creds
-vault kv get -field=password secret/postgres-creds
+    vault kv get -field=username secret/postgres-creds
+    vault kv get -field=password secret/postgres-creds
 
-**Dockerfile Integration: Add Vault CLI installation and configuration steps to your Dockerfile for secrets retrieval:**
+    **Dockerfile Integration: Add Vault CLI installation and configuration steps to your Dockerfile for secrets retrieval:**
 
-Dockerfile:
 ```sh
 RUN apk add --no-cache curl
 RUN curl -fsSL -o /tmp/vault.zip https://releases.hashicorp.com/vault/X.X.X/vault_X.X.X_linux_amd64.zip \
