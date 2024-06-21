@@ -1,11 +1,11 @@
 # Ansible Nginx Setup
 
-This repository contains Ansible playbooks and configurations to set up an Nginx web server on multiple EC2 instances and display a custom "Hello World" page.
+This repository contains Ansible playbooks and configurations to set up a Nginx web server on multiple EC2 instances and display a custom "Hello World" page.
 
 ## Prerequisites
 
 1. **EC2 Instances**
-   - Create two EC2 instances with Ubuntu and ensure they are running. [allow inound traffic on port 80]
+   - Create two EC2 instances with Ubuntu and ensure they are running. [allow inbound traffic on port 80]
    - Attach a security group that allows inbound traffic on port 80 (HTTP).
 
 2. **SSH Key**
@@ -18,7 +18,7 @@ This repository contains Ansible playbooks and configurations to set up an Nginx
 3. **Ansible Installed on Local Machine**
    - Install Ansible and Python on your local machine:
 ```sh
-    #create an python virtual environment
+    #create a python virtual environment
      python3 -m venv ./venev && source ./venv/bin/activate
      (venv) user@user:~/home/ pip3 install ansible=8.x.x
      ansible --version

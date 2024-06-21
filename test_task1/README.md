@@ -1,9 +1,9 @@
-### Configuring the EC2 instance to install Nginx: 
-It is done using the `user_data` script in the `aws_instance` resource above. The script is responsible to updates the package lists, install Nginx, starts the Nginx service, and ensures it starts on boot.
+## Configuring the EC2 instance to install Nginx: 
+It is done using the `user_data` script in the `aws_instance` resource above. The script is responsible for updating the package lists, installing Nginx, starting the Nginx service, and ensuring it starts on boot.
 
 Security for the server is managed by the security group `nginx_sg` defined above, which allows incoming HTTP traffic on port 80.
 
-# Terraform Nginx Server on AWS
+## Terraform Nginx Server on AWS
 
 This repository contains Terraform configuration files to provision an EC2 instance running Ubuntu 20.04 with Nginx installed.
 
@@ -41,8 +41,8 @@ terraform apply
 5. Confirm the apply setup with yes.
 
 ### Accessing the Nginx Server
-Once the apply step completes, the public IP address of the EC2 instance will be displayed.
-You  can access the Nginx server by entering this IP Address in your web browser.
+Once the terraform apply step is completed, the public IP address of the EC2 instance will be displayed.
+You can access the Nginx server by entering this IP Address in your web browser.
 
 ```sh
 Outputs:

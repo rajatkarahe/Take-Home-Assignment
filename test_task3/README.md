@@ -9,7 +9,7 @@ This Dockerfile installs PostgreSQL 13, creates a new user and database, and con
 
 ## Extra Credit #1: Secret Encryption Solution
 To implement secret encryption for PostgreSQL credentials:
-- You can export environment variable, and then use it in your dockerfile.Update Dockerfile to Accept the build argument.
+- You can export environment variable, and then use it in your dockerfile. Update Dockerfile to Accept the build argument.
 Dockerfile:
 ARG POSTGRES_PASSWORD
 
