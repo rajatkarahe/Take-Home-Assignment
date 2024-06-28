@@ -134,3 +134,7 @@ After configuring your backend and creating the DynamoDB table, Terraform will a
 
 **Tradeoffs:**
 Using an S3 backend adds a slight complexity in setup but provides significant benefits in terms of durability, availability, and collaboration capabilities. For small teams or individual projects, local state management might suffice, but as the infrastructure grows or team size increases, a remote backend like S3 becomes essential.
+
+
+**Extras:**
+We can use auto-scaling group to provision EC2 instance. Using an Auto Scaling Group (ASG) ensures high availability, scalability, and cost efficiency. ASGs automatically adjust the number of instances based on traffic demands, provide load balancing for better performance, and replace unhealthy instances, ensuring minimal downtime. This approach optimizes resource usage, improves reliability, and reduces manual intervention.

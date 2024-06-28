@@ -2,6 +2,9 @@ FROM ubuntu:latest
 
 # ARG POSTGRES_PASSWORD
 
+# Set environment variables to avoid interactive prompts
+ENV DEBIAN_FRONTEND=noninteractive
+
 # Update the package repository and install PostgreSQL
 RUN apt-get update && \
     apt-get install -y gnupg2 wget lsb-release && \

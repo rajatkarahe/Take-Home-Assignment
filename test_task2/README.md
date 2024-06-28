@@ -181,5 +181,3 @@ To ensure proper setup and functionality of the configurations:
 - **Ansible Playbook:** This project is managed through an Ansible playbook (`playbook.yml`) which orchestrates the tasks described above.
 - **Fluentd Configuration:** The `fluentd.conf.j2` template file contains the configuration used for Fluentd, located in `roles/fluentd/templates/fluentd.conf.j2`.
 - **Server Requirements:** Ensure the target server is a Debian/Ubuntu system with internet access for package installation and Fluentd setup.
-
-
