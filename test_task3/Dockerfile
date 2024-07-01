@@ -1,7 +1,5 @@
 FROM ubuntu:latest
 
-# ARG POSTGRES_PASSWORD
-
 # Set environment variables to avoid interactive prompts
 ENV DEBIAN_FRONTEND=noninteractive
 

@@ -19,6 +19,7 @@ This repository contains Ansible playbooks and configurations to set up a Nginx 
    - Install Ansible and Python on your local machine:
 ```sh
     #create a python virtual environment
+    # Python version >= 3.10.0
      python3 -m venv ./venv && source ./venv/bin/activate
      (venv) user@user:~/home/ pip3 install --upgrade pip && pip3 install ansible==8.7.0
      ansible --version

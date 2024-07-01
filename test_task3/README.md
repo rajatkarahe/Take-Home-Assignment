@@ -32,18 +32,6 @@ Replace /path/on/host with your preferred directory path on the host machine.
 
 ## Extra Credit #1: Secret Encryption Solution
 To implement secret encryption for PostgreSQL credentials:
-- You can export environment variable, and then use it in your dockerfile. Update Dockerfile to Accept the build argument.
-Dockerfile:
-ARG POSTGRES_PASSWORD
-
-```sh
-export POSTGRES_PASSWORD=mypassword
-docker build --build-arg POSTGRES_PASSWORD=$POSTGRES_PASSWORD -t postgres-image-secret .
-docker run -d -p 5432:5432 --name postgres-container postgresql-image
-#Verify PostgresSQL Connectivity
-psql -h localhost -U myuser -d mydatabase
-
-```
 - Use Docker secrets or environment variables to securely pass credentials to the containerized application.
 For that follow the below:
 Update the Dockerfile to use docker secrets:
