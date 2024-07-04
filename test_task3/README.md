@@ -3,9 +3,10 @@
 This Dockerfile installs PostgreSQL 13, creates a new user and database, and configures PostgreSQL to allow remote connections.
 
 ## Fixes Implemented:
-- Corrected PostgreSQL installation to version 13 using PGDG repository.
-- Fixed `sed` command to properly update `postgresql.conf`.
-- Separated `CMD` instructions to ensure PostgreSQL starts correctly.
+- Corrected PostgreSQL installation to version 13 using PGDG repository. As not specifying the version may lead to the latest version installation which is version 13.
+- Double quotes (`"`) were used around the sed command. This allows for variable expansion (`* and /`) within the sed command itself.
+- replaced `CMD` instructions with  `ENTRYPOINT` to ensure essential services (like PostgreSQL) are started automatically when the container starts, improving automation and ensuring consistency in deployment environments.
+- `ENTRYPOINT` combined with `exec "$@"` allows for flexibility in running additional commands or overriding the default behavior of the container at runtime. Users can specify commands or arguments when starting the container, which will be executed in place of `tail -f /dev/null`.
 
 ### Dockerfile Configuration for PostgreSQL Data Persistence
 The provided Dockerfile ensures PostgreSQL data persistence by:
@@ -32,7 +33,13 @@ Replace /path/on/host with your preferred directory path on the host machine.
 
 ## Extra Credit #1: Secret Encryption Solution
 To implement secret encryption for PostgreSQL credentials:
-- Use Docker secrets or environment variables to securely pass credentials to the containerized application.
+- **Secret Implementation:**
+
+Sensitive database credentials (`POSTGRES_USER and POSTGRES_PASSWORD`) are sourced from an `.env` file within the container's environment. To enhance security.
+
+You consider using a secret management solution like Docker secrets, Kubernetes secrets, or environment encryption tools to further protect these credentials from exposure in plain text.
+
+- **Use Docker secrets or environment variables to securely pass credentials to the containerized application.**
 For that follow the below:
 Update the Dockerfile to use docker secrets:
 Dockerfile:
@@ -48,27 +55,7 @@ docker swarm init --advertise-addr 192.168.29.22
 echo "mypassword" | docker secret create postgres_password -
 ```
 
-- **Usage of Vault for PostgreSQL Secret Encryption**
-    Setup Vault: Ensure Vault is initialized and unsealed with appropriate access policies for PostgreSQL secrets.
 
-    **Store PostgreSQL Credentials: Use Vault to securely store PostgreSQL credentials as a key-value pair:**
-
-    vault kv put secret/postgres-creds username=myuser password=mypassword
-
-    **Access PostgreSQL Secrets: Configure your application or service to retrieve PostgreSQL credentials from Vault:**
-
-    vault kv get -field=username secret/postgres-creds
-
-    **Dockerfile Integration: Add Vault CLI installation and configuration steps to your Dockerfile for secrets retrieval:**
-
-```sh
-RUN apk add --no-cache curl
-RUN curl -fsSL -o /tmp/vault.zip https://releases.hashicorp.com/vault/X.X.X/vault_X.X.X_linux_amd64.zip \
-    && unzip /tmp/vault.zip -d /usr/local/bin/ \
-    && rm /tmp/vault.zip
-ENV VAULT_ADDR=http://vault:8200
-#Replace X.X.X with the latest version of Vault. Ensure Vault is accessible via VAULT_ADDR environment variable.
-```
 
 ## Extra Credit #2: Troubleshooting Steps for Running Container Issues
 To troubleshoot issues with a running container:
@@ -87,9 +74,9 @@ netstat -tuln | grep :5432
 ## Building and Running the Docker Image
 1. **Build Docker Image**:
 ```sh
-docker build -t postgresql-image .
+docker build -t my_postgres_image .
 #Run Docker Container
-docker run -d -p 5432:5432 --name postgres-container postgresql-image
+docker run -p 5432:5432 --env-file .env -d --name my_postgres_container my_postgres_image
 #Verify PostgresSQL Connectivity
 psql -h localhost -U myuser -d mydatabase
 
@@ -100,7 +87,23 @@ Type "help" for help.
 
 mydatabase=#
 ```
+
+
 ![alt text](<Screenshot from 2024-06-21 15-44-28.png>)
+
+Also you can test the database like this:
+```sh
+#get inside the postgres container
+docker exec -it my_postgres_container bash
+```
+![alt text](<Screenshot from 2024-07-04 10-31-54.png>)
+
+```sh
+#Or you can access the database from localhost
+psql -h localhost -U myuser mydatabase
+
+```
+![alt text](<Screenshot from 2024-07-04 10-36-38.png>)
 
 ### Summary:
 This README.md provides comprehensive documentation addressing the assignment requirements, including fixing Dockerfile1, implementing optional extra credit solutions, and outlining troubleshooting steps for container issues. Adjustments may be needed based on specific environment configurations or additional requirements.
