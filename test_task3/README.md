@@ -5,7 +5,6 @@ This Dockerfile installs PostgreSQL 13, creates a new user and database, and con
 ## Fixes Implemented:
 - Corrected PostgreSQL installation to version 13 using PGDG repository. As not specifying the version may lead to the latest version installation which is version 13.
 - Double quotes (`"`) were used around the sed command. This allows for variable expansion (`* and /`) within the sed command itself.
-- replaced `CMD` instructions with  `ENTRYPOINT` to ensure essential services (like PostgreSQL) are started automatically when the container starts, improving automation and ensuring consistency in deployment environments.
 - `ENTRYPOINT` combined with `exec "$@"` allows for flexibility in running additional commands or overriding the default behavior of the container at runtime. Users can specify commands or arguments when starting the container, which will be executed in place of `tail -f /dev/null`.
 
 ### Dockerfile Configuration for PostgreSQL Data Persistence
@@ -77,20 +76,7 @@ netstat -tuln | grep :5432
 docker build -t my_postgres_image .
 #Run Docker Container
 docker run -p 5432:5432 --env-file .env -d --name my_postgres_container my_postgres_image
-#Verify PostgresSQL Connectivity
-psql -h localhost -U myuser -d mydatabase
-
-#Output of Working Version
-#Upon successful connectivity using psql, you should see:
-psql (13.x)
-Type "help" for help.
-
-mydatabase=#
 ```
-
-
-![alt text](<Screenshot from 2024-06-21 15-44-28.png>)
-
 Also you can test the database like this:
 ```sh
 #get inside the postgres container
