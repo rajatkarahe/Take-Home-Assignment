@@ -6,6 +6,7 @@ This Dockerfile installs PostgreSQL 13, creates a new user and database, and con
 - Corrected PostgreSQL installation to version 13 using PGDG repository. As not specifying the version may lead to the latest version installation which is version 13.
 - Double quotes (`"`) were used around the sed command. This allows for variable expansion (`* and /`) within the sed command itself.
 - `ENTRYPOINT` combined with `exec "$@"` allows for flexibility in running additional commands or overriding the default behavior of the container at runtime. Users can specify commands or arguments when starting the container, which will be executed in place of `tail -f /dev/null`.
+- Added a check to the create user and database command to handle the case of container restart
 
 ### Dockerfile Configuration for PostgreSQL Data Persistence
 The provided Dockerfile ensures PostgreSQL data persistence by:
