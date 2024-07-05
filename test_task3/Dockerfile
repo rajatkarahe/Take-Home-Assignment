@@ -24,5 +24,7 @@ EXPOSE 5432
 # Set the data directory as a volume
 VOLUME /var/lib/postgresql/data
 
-# Set entrypoint
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+
+CMD tail -f /dev/null
+

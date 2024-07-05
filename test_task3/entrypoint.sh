@@ -40,8 +40,5 @@ else
   echo "Database $POSTGRES_DB already exists"
 fi
 
-# Keep the container running
-tail -f /dev/null
-
 # Execute any additional commands
 exec "$@"
