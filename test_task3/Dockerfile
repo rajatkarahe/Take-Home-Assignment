@@ -26,5 +26,4 @@ VOLUME /var/lib/postgresql/data
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
-CMD tail -f /dev/null
-
+CMD ["tail", "-f", "/dev/null"]
