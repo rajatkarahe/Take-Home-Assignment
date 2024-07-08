@@ -60,7 +60,6 @@
   apt:
     name: ufw
     state: present
-  when: ansible_os_family == 'Debian'
 
 - name: Set default UFW policies
   ufw:
@@ -78,6 +77,13 @@
   ufw:
     rule: allow
     port: 80
+    proto: tcp
+    state: enabled
+
+- name: Allow incoming traffic on port 22
+  ufw:
+    rule: allow
+    port: 22
     proto: tcp
     state: enabled
 
