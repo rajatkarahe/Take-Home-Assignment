@@ -3,38 +3,32 @@ FROM ubuntu:latest
 # Set environment variables to avoid interactive prompts
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Update the package repository and install PostgreSQL
-RUN apt-get update && \
-    apt-get install -y gnupg2 wget lsb-release && \
-    wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
+# Update the package list and install required packages
+RUN apt-get update && apt-get install -y \
+    wget \
+    gnupg \
+    lsb-release
+
+# Add PostgreSQL APT repository
+RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
     echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" | tee /etc/apt/sources.list.d/pgdg.list && \
-    apt-get update && \
-    apt-get install -y postgresql-13
 
-# Create directory for PostgreSQL data
-# RUN mkdir -p /var/lib/postgresql/data && chown -R postgres:postgres /var/lib/postgresql/data
+# Update the package list again and install PostgreSQL
+RUN apt-get update && apt-get install -y postgresql-13 postgresql-contrib
 
-# RUN service postgresql start && \
-#     su - postgres -c "psql -c \"CREATE USER myuser WITH PASSWORD '$(cat /run/secrets/postgres_password)';\"" && \
-#     su - postgres -c "createdb -O myuser mydatabase"
+# Copy entrypoint script and make it executable
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
-#Implement a secret access solution n in order to prevent exposure of the postgres db credentials.
-# RUN service postgresql start && \
-#     su - postgres -c "psql -c \"CREATE USER myuser WITH PASSWORD '${POSTGRES_PASSWORD}';\"" && \
-#     su - postgres -c "createdb -O myuser mydatabase"
-
-RUN service postgresql start && \
-    su - postgres -c "psql -c \"CREATE USER myuser WITH PASSWORD 'mypassword';\"" && \
-    su - postgres -c "createdb -O myuser mydatabase"
-
-# Update postgresql.conf and pg_hba.conf to allow remote connections
-RUN sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '*'/g" /etc/postgresql/13/main/postgresql.conf && \
-    echo "host all all 0.0.0.0/0 trust" >> /etc/postgresql/13/main/pg_hba.conf
+# Switch to the postgres user
+USER postgres
 
 # Expose PostgreSQL port
 EXPOSE 5432
 
 # Set the data directory as a volume
-# VOLUME /var/lib/postgresql/data
+VOLUME /var/lib/postgresql/13/main
 
-CMD service postgresql start && tail -f /dev/null
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+
+CMD ["tail", "-f", "/dev/null"]
